@@ -1,4 +1,5 @@
 import TemplateComponent from '../templates/TemplateComponent';
+import CreateCustomer from './CreateCustomer';
 
 export default class Customer extends TemplateComponent {
   constructor() {
@@ -11,6 +12,8 @@ export default class Customer extends TemplateComponent {
         3: 'Address',
         4: 'Phone',
       },
+      body: CreateCustomer,
+      url: '/customers',
     };
   }
 

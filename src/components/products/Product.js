@@ -1,4 +1,5 @@
 import TemplateComponent from '../templates/TemplateComponent';
+import CreateProduct from './CreateProduct';
 
 export default class Product extends TemplateComponent {
   constructor() {
@@ -10,6 +11,7 @@ export default class Product extends TemplateComponent {
         2: 'Name',
         3: 'Price',
       },
+      body: CreateProduct,
     };
   }
 

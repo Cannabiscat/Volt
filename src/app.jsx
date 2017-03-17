@@ -17,9 +17,6 @@ render(
   <Router history={browserHistory}>
     <Route path='/' component={App}>
       <IndexRoute component={Home} />
-      <Route path='invoices' component={Invoice}>
-        <Route path='/invoices/:invoice' component={Invoice} />
-      </Route>
       <Route path='customers' component={Customer} />
       <Route path='products' component={Product} />
       <Route path='*' component={NotFound} />
