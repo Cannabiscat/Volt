@@ -1,11 +1,11 @@
 import React from 'react';
 import TemplateElem from './TemplateElem';
 
-const template = ({ name, columns, data, editOnClick, createOnClick }) => {
+const template = ({ name, columns, data, editOnClick, createOnClick, deleteOnClick }) => {
   return (
     <div>
       <div className='col-md-12'>
-        <h1><strong>{name} List</strong><button className='btn btn-default' onClick={editOnClick}>Create</button></h1>
+        <h1><strong>{name} List</strong><button className='btn btn-default' onClick={createOnClick}>Create</button></h1>
       </div>
       <table className='user-list table table-striped'>
         <thead>
@@ -20,6 +20,7 @@ const template = ({ name, columns, data, editOnClick, createOnClick }) => {
             key={item.data.idx}
             dataId={item.id}
             editOnClick={editOnClick}
+            deleteOnClick={deleteOnClick}
           />) :
           ''}
         </tbody>
@@ -33,5 +34,6 @@ template.propTypes = {
   data: React.PropTypes.array,
   editOnClick: React.PropTypes.func,
   createOnClick: React.PropTypes.func,
+  deleteOnClick: React.PropTypes.func,
 };
 export default template;

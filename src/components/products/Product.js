@@ -10,27 +10,25 @@ export default class Product extends TemplateComponent {
         1: '#',
         2: 'Name',
         3: 'Price',
+        4: '',
       },
       body: CreateProduct,
+      url: '/api/products',
+      getDataObject: (item, index) => {
+        return {
+          id: item.id,
+          data: {
+            idx: index + 1,
+            id: item.id,
+            name: item.name,
+            price: item.price,
+          },
+        };
+      },
     };
   }
 
   componentWillMount() {
-    fetch('/api/products')
-      .then(res => res.json())
-      .then((res) => {
-        const data = res.reduce((acc, item, index) => {
-          return acc.concat({
-            id: item.id,
-            data: {
-              idx: index + 1,
-              id: item.id,
-              name: item.name,
-              price: item.price,
-            },
-          });
-        }, []);
-        this.setState({ data });
-      });
+    this.getData();
   }
 }
