@@ -1,10 +1,17 @@
-import React, { PureComponent } from 'react';
-import Template from '../templates/templateList';
+import TemplateComponent from '../templates/TemplateComponent';
 
-export default class InvoiceList extends PureComponent {
+export default class InvoiceList extends TemplateComponent {
   constructor() {
     super();
-    this.state = {};
+    this.state = {
+      name: 'Invoice',
+      columns: {
+        1: '#',
+        2: 'customer',
+        3: 'discount',
+        4: 'total',
+      },
+    };
   }
 
   componentWillMount() {
@@ -25,20 +32,5 @@ export default class InvoiceList extends PureComponent {
         }, []);
         this.setState({ data });
       });
-  }
-
-  render() {
-    const name = 'Invoice';
-    const columns = {
-      1: '#',
-      2: 'customer',
-      3: 'discount',
-      4: 'total',
-    };
-    return (
-      <div className='row'>
-        <Template name={name} columns={columns} />
-      </div>
-    );
   }
 }

@@ -1,11 +1,11 @@
 import React from 'react';
-import TemplateElem from './templateElems';
+import TemplateElem from './TemplateElem';
 
-const template = ({ name, columns, data, modalOnClickFunction }) => {
+const template = ({ name, columns, data, editOnClick, createOnClick }) => {
   return (
     <div>
       <div className='col-md-12'>
-        <h1><strong>{name} List</strong><button className='btn btn-default'>Create</button></h1>
+        <h1><strong>{name} List</strong><button className='btn btn-default' onClick={editOnClick}>Create</button></h1>
       </div>
       <table className='user-list table table-striped'>
         <thead>
@@ -15,7 +15,12 @@ const template = ({ name, columns, data, modalOnClickFunction }) => {
         </thead>
         <tbody>
           {(data) ?
-          data.map(item => <TemplateElem data={item.data} key={item.data.idx} dataId={item.id} onClickFunction={modalOnClickFunction} />) :
+          data.map(item => <TemplateElem
+            data={item.data}
+            key={item.data.idx}
+            dataId={item.id}
+            editOnClick={editOnClick}
+          />) :
           ''}
         </tbody>
       </table>
@@ -26,6 +31,7 @@ template.propTypes = {
   name: React.PropTypes.string.isRequired,
   columns: React.PropTypes.object.isRequired,
   data: React.PropTypes.array,
-  modalOnClickFunction: React.PropTypes.func,
+  editOnClick: React.PropTypes.func,
+  createOnClick: React.PropTypes.func,
 };
 export default template;

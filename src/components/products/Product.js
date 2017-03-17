@@ -1,10 +1,16 @@
-import React, { PureComponent } from 'react';
-import Template from '../templates/templateList';
+import TemplateComponent from '../templates/TemplateComponent';
 
-export default class Product extends PureComponent {
+export default class Product extends TemplateComponent {
   constructor() {
     super();
-    this.state = {};
+    this.state = {
+      name: 'Products',
+      columns: {
+        1: '#',
+        2: 'Name',
+        3: 'Price',
+      },
+    };
   }
 
   componentWillMount() {
@@ -24,19 +30,5 @@ export default class Product extends PureComponent {
         }, []);
         this.setState({ data });
       });
-  }
-
-  render() {
-    const name = 'Product';
-    const columns = {
-      1: '#',
-      2: 'Name',
-      3: 'Price',
-    };
-    return (
-      <div className='row'>
-        <Template name={name} columns={columns} data={this.state.data} />
-      </div>
-    );
   }
 }
