@@ -1,3 +1,5 @@
+import React from 'react';
+import { Link } from 'react-router';
 import TemplateComponent from '../templates/TemplateComponent';
 
 export default class InvoiceList extends TemplateComponent {
@@ -10,8 +12,16 @@ export default class InvoiceList extends TemplateComponent {
         2: 'customer',
         3: 'discount',
         4: 'total',
+        5: '',
+      },
+      body: () => {
+        return null;
       },
     };
+    this.createOnClick = () => {
+
+    };
+    this.createButton = <Link className='btn btn-default create' to='/invoices/create'>Create</Link>;
   }
 
   componentWillMount() {

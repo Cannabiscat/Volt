@@ -1,4 +1,4 @@
-h1 > button {
+h1 > .create {
   margin-left: 2em;
 }
 .buttons-cell {
@@ -17,4 +17,8 @@ h1 > button {
 .confirm {
   display: flex;
   justify-content: center;
+}
+
+.form-create-invoice {
+  width: 40%;
 }

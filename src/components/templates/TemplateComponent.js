@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import axios from 'axios';
 import Template from './TemplateList';
-import TemplateModal from './TemplateModal';
+import TemplateCreateEdit from './TemplateCreateEdit';
 import TemplateModalDeleteConfirm from './TemplateModalDeleteConfirm';
 
 export default class TemplateClass extends PureComponent {
@@ -27,7 +27,7 @@ export default class TemplateClass extends PureComponent {
         initialState: {},
       });
     };
-    this.open = (e) => {
+    this.openEditCreate = (e) => {
       e.preventDefault();
       const item = Object.keys(this.state.data)
         .filter(i => this.state.data[i].id === Number(e.target.dataset.id));
@@ -83,6 +83,7 @@ export default class TemplateClass extends PureComponent {
           });
         });
     };
+    this.createButton = <button className='btn btn-default create' onClick={this.openEditCreate}>Create</button>;
   }
 
   render() {
@@ -92,11 +93,12 @@ export default class TemplateClass extends PureComponent {
           name={this.state.name}
           columns={this.state.columns}
           data={this.state.data}
-          editOnClick={this.open}
-          createOnClick={this.open}
+          editOnClick={this.openEditCreate}
+          // createOnClick={this.openEditCreate}
+          createButton={this.createButton}
           deleteOnClick={this.openConfirm}
         />
-        <TemplateModal
+        <TemplateCreateEdit
           showVariable={this.state.showModal}
           idToEdit={this.state.idToEdit}
           close={this.close}

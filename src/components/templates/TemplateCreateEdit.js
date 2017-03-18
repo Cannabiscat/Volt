@@ -1,6 +1,6 @@
 import React from 'react';
 
-const templateModal = ({ showVariable, idToEdit, close, Content, send, initialData }) => {
+const templateCreateEdit = ({ showVariable, idToEdit, close, Content, send, initialData }) => {
   return (
     <Content
       showVariable={showVariable}
@@ -11,7 +11,7 @@ const templateModal = ({ showVariable, idToEdit, close, Content, send, initialDa
     />
   );
 };
-templateModal.propTypes = {
+templateCreateEdit.propTypes = {
   showVariable: React.PropTypes.bool,
   close: React.PropTypes.func,
   send: React.PropTypes.func,
@@ -19,4 +19,4 @@ templateModal.propTypes = {
   initialData: React.PropTypes.object,
   idToEdit: React.PropTypes.string,
 };
-export default templateModal;
+export default templateCreateEdit;
