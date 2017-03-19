@@ -22,3 +22,9 @@ h1 > .create {
 .form-create-invoice {
   width: 40%;
 }
+.invoiceProductTable {
+  table-layout: fixed;
+}
+.qty {
+  padding-left: 0;
+}
