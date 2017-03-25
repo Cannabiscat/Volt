@@ -12,6 +12,7 @@ export default class CreateInvoice extends PureComponent {
         nextIndexForIterateElement: 1,
         source: [],
       },
+      // discount: '0',
       total: 0,
     };
 
@@ -97,7 +98,7 @@ export default class CreateInvoice extends PureComponent {
     };
 
     this.updateInvoice = () => {
-
+      
     };
   }
 
@@ -110,7 +111,38 @@ export default class CreateInvoice extends PureComponent {
     axios.get('/api/products')
       .then(res => this.setState({
         products: res.data,
-      }));
+      }))
+      .then(() => {
+        axios.get(`/api/invoices/${this.props.params.invoice}`)
+          .then((res) => {
+            if (res.data) {
+              document.getElementById('discount').value = res.data.discount || '0';
+              this.setState({ currentCustomer: res.data.customer_id });
+            }
+          });
+      })
+      .then(() => {
+        if (this.props.params.invoice !== undefined) {
+          axios.get(`/api/invoices/${this.props.params.invoice}/items`)
+            .then((res) => {
+              const source = res.data.reduce((acc, item, index) => {
+                const newItem = {
+                  itemData: {
+                    id: item.product_id,
+                    name: this.state.products
+                      .filter(prodItem => prodItem.id === item.product_id)[0].name,
+                    price: this.state.products
+                      .filter(prodItem => prodItem.id === item.product_id)[0].price,
+                  },
+                  itemId: index + 1,
+                  qty: item.quantity,
+                };
+                return [...acc, newItem];
+              }, []);
+              this.setState({ data: { source } });
+            });
+        }
+      });
   }
 
   componentDidUpdate() {
@@ -118,9 +150,28 @@ export default class CreateInvoice extends PureComponent {
   }
 
   render() {
+    const selectOptionsCustomer = (this.state.customers) ?
+      this.state.customers.map((item) => {
+        return (
+          <option key={item.id} value={item.id}>{item.name}</option>
+        );
+      })
+      :
+      <option value=''>None</option>;
+
+    const tableListOfProducts = this.state.data.source.map(item => (
+      <tr key={item.itemId} id={item.itemId} className='invoiceProduct'>
+        <td>{item.itemData.name}</td>
+        <td id={`price-${item.itemId}`}>{item.itemData.price}</td>
+        <td id={`qty-${item.itemId}`}>
+          <FormControl type='number' defaultValue='1' onChange={this.addProductQuantity} data-id={item.itemId} />
+        </td>
+        <td><Button bsStyle='danger' onClick={this.removeProduct} data-id={item.itemId}>Delete</Button></td>
+      </tr>));
+
     return (
       <div >
-        <h1>Create invoice</h1>
+        <h1>{(this.props.params.invoice === undefined) ? 'Create' : 'Edit' } invoice</h1>
         <Form horizontal onSubmit={this.sendData}>
           <FormGroup>
             <Col sm={2}>
@@ -131,15 +182,8 @@ export default class CreateInvoice extends PureComponent {
           <FormGroup>
             <Col sm={4}>
               <label htmlFor='customer'>Customer</label>
-              <FormControl componentClass='select' id='customer' onChange={(e) => { this.setState({ currentCustomer: Number(e.target.value) }); }}>
-                {(this.state.customers) ?
-                    this.state.customers.map((item) => {
-                      return (
-                        <option key={item.id} value={item.id}>{item.name}</option>
-                      );
-                    })
-                    :
-                    <option value='' disabled>None</option>}
+              <FormControl componentClass='select' id='customer' value={(this.state.currentCustomer) ? this.state.currentCustomer : ''} onChange={(e) => { this.setState({ currentCustomer: Number(e.target.value) }); }}>
+                {selectOptionsCustomer}
               </FormControl>
             </Col>
           </FormGroup>
@@ -169,15 +213,7 @@ export default class CreateInvoice extends PureComponent {
               </tr>
             </thead>
             <tbody>
-              {this.state.data.source.map(item => (
-                <tr key={item.itemId} id={item.itemId} className='invoiceProduct'>
-                  <td>{item.itemData.name}</td>
-                  <td id={`price-${item.itemId}`}>{item.itemData.price}</td>
-                  <td id={`qty-${item.itemId}`}>
-                    <FormControl type='number' defaultValue='1' onChange={this.addProductQuantity} data-id={item.itemId} />
-                  </td>
-                  <td><Button bsStyle='danger' onClick={this.removeProduct} data-id={item.itemId}>Delete</Button></td>
-                </tr>))}
+              {tableListOfProducts}
             </tbody>
           </Table>
           <h1>Total: {this.state.total}</h1>
@@ -192,3 +228,7 @@ export default class CreateInvoice extends PureComponent {
     );
   }
 }
+
+CreateInvoice.propTypes = {
+  params: React.PropTypes.object,
+};

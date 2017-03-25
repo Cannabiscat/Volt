@@ -20,7 +20,7 @@ render(
       <IndexRoute component={Home} />
       <Route path='invoices' component={Invoice} />
       <Route path='/invoices/create' component={CreateInvoice} />
-      <Route path='/invoices/:invoice' component={Home} />
+      <Route path='/invoices/:invoice' component={CreateInvoice} />
       <Route path='customers' component={Customer} />
       <Route path='products' component={Product} />
       <Route path='*' component={NotFound} />

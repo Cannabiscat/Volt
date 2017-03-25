@@ -27,7 +27,7 @@ export default class TemplateClass extends PureComponent {
         initialState: {},
       });
     };
-    this.openEditCreate = (e) => {
+    this.openEdit = (e) => {
       e.preventDefault();
       const item = Object.keys(this.state.data)
         .filter(i => this.state.data[i].id === Number(e.target.dataset.id));
@@ -83,7 +83,7 @@ export default class TemplateClass extends PureComponent {
           });
         });
     };
-    this.createButton = <button className='btn btn-default create' onClick={this.openEditCreate}>Create</button>;
+    this.createButton = <button className='btn btn-default create' onClick={this.openEdit}>Create</button>;
   }
 
   render() {
@@ -93,8 +93,7 @@ export default class TemplateClass extends PureComponent {
           name={this.state.name}
           columns={this.state.columns}
           data={this.state.data}
-          editOnClick={this.openEditCreate}
-          // createOnClick={this.openEditCreate}
+          editOnClick={this.openEdit}
           createButton={this.createButton}
           deleteOnClick={this.openConfirm}
         />

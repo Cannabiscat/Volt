@@ -22,28 +22,35 @@ export default class InvoiceList extends TemplateComponent {
       url: '/api/invoices',
     };
     this.getData = () => {
-      axios(this.state.url)
-      .then(res => res.data)
-      .then((res) => {
-        res.map((item, index) => {
-          axios.get(`/api/customers/${item.customer_id}`).then(resolve => resolve.data).then((r) => {
-            const dataItem = {
+      axios.get('/api/customers')
+      .then(res => this.setState({
+        customers: res.data,
+      }))
+      .then(() => {
+        axios(this.state.url)
+        .then(res => res.data)
+        .then((res) => {
+          const data = res.reduce((acc, item, index) => {
+            const dataitem = {
               idx: index + 1,
-              customer: r.name,
+              customer: this.state.customers.filter(custItem => custItem.id === item.customer_id)[0]
+                .name,
               discount: item.discount,
               total: item.total,
             };
-            return dataItem;
-          }).then((r) => {
-            this.setState({ data: this.state.data.concat([{ id: item.id, data: r }]) });
-          });
-          return item;
+            return [...acc, { id: item.id, data: dataitem }];
+          }, []);
+          this.setState({ data });
         });
       });
     };
-    this.createButton = <Link className='btn btn-default create' to='/invoices/create'>Create</Link>;
+    this.createButton = <Link className='btn btn-default create' to='/invoices/create' data={'hi'} >Create</Link>;
+    this.openEdit = (e) => {
+      browserHistory.push(`/invoices/${e.target.dataset.id}`);
+    };
     this.delete = () => {
-      axios.delete(`/api/invoices/${this.state.idToDelete}`).then(() => this.setState({ showConfirmModal: false })).then(() => browserHistory.push('/invoices'));
+      axios.delete(`/api/invoices/${this.state.idToDelete}`)
+        .then(() => { this.getData(); return this.setState({ showConfirmModal: false }); });
     };
   }
 
