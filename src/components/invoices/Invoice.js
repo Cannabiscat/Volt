@@ -33,8 +33,9 @@ export default class InvoiceList extends TemplateComponent {
           const data = res.reduce((acc, item, index) => {
             const dataitem = {
               idx: index + 1,
-              customer: this.state.customers.filter(custItem => custItem.id === item.customer_id)[0]
-                .name,
+              customer: (this.state.customers.filter(custItem => custItem.id === item.customer_id)[0]) ?
+              this.state.customers.filter(custItem => custItem.id === item.customer_id)[0]
+                .name : 'Customer has been deleted',
               discount: item.discount,
               total: item.total,
             };

@@ -12,8 +12,8 @@ export default class CreateInvoice extends PureComponent {
         nextIndexForIterateElement: 1,
         source: [],
       },
-      // discount: '0',
       total: 0,
+      deleted_items_id: [],
     };
 
     this.addProduct = () => {
@@ -39,7 +39,7 @@ export default class CreateInvoice extends PureComponent {
       const productId = Number(e.target.dataset.id);
       const newSource = this.state.data.source.map((item) => {
         const newItem = (item.itemId === productId) ?
-          { itemId: item.itemId, itemData: item.itemData, qty: Number(e.target.value) } :
+          { itemId: item.itemId, itemData: item.itemData, qty: Number(e.target.value), invoice_item_id: item.invoice_item_id } :
           item;
         return newItem;
       });
@@ -53,8 +53,10 @@ export default class CreateInvoice extends PureComponent {
 
     this.removeProduct = (e) => {
       const removeID = Number(e.target.dataset.id);
+      const removeInvoiceItemId = Number(e.target.dataset.invoice_item_id);
       const newSource = this.state.data.source.filter(item => item.itemId !== removeID);
       this.setState({
+        deleted_items_id: [...this.state.deleted_items_id, removeInvoiceItemId],
         data: {
           nextIndexForIterateElement: this.state.data.nextIndexForIterateElement,
           source: newSource,
@@ -72,7 +74,7 @@ export default class CreateInvoice extends PureComponent {
 
     this.sendData = (e) => {
       e.preventDefault();
-      if (!this.state.id) {
+      if (!this.props.params.invoice) {
         this.createNewInvoice();
       } else {
         this.updateInvoice();
@@ -98,7 +100,29 @@ export default class CreateInvoice extends PureComponent {
     };
 
     this.updateInvoice = () => {
-      
+      const sendInvoiceData = {
+        customer_id: this.state.currentCustomer,
+        discount: this.state.discount,
+        total: this.state.total,
+      };
+      this.state.deleted_items_id.map(item => axios.delete(`/api/invoices/${this.props.params.invoice}/items/${item}`));
+      axios.put(`/api/invoices/${this.props.params.invoice}`, sendInvoiceData)
+        .then(() => {
+          this.state.data.source.map((item) => {
+            if (item.invoice_item_id) {
+              axios.put(`/api/invoices/${this.props.params.invoice}/items/${item.invoice_item_id}`, {
+                product_id: item.itemData.id,
+                quantity: item.qty,
+              });
+            } else {
+              axios.post(`/api/invoices/${this.props.params.invoice}/items/`, {
+                product_id: item.itemData.id,
+                quantity: item.qty,
+              });
+            }
+            return item;
+          });
+        }).then(() => browserHistory.push('/invoices'));
     };
   }
 
@@ -125,7 +149,7 @@ export default class CreateInvoice extends PureComponent {
         if (this.props.params.invoice !== undefined) {
           axios.get(`/api/invoices/${this.props.params.invoice}/items`)
             .then((res) => {
-              const source = res.data.reduce((acc, item, index) => {
+              const data = res.data.reduce((acc, item, index) => {
                 const newItem = {
                   itemData: {
                     id: item.product_id,
@@ -136,10 +160,11 @@ export default class CreateInvoice extends PureComponent {
                   },
                   itemId: index + 1,
                   qty: item.quantity,
+                  invoice_item_id: item.id,
                 };
-                return [...acc, newItem];
-              }, []);
-              this.setState({ data: { source } });
+                return { nextIndexForIterateElement: index + 2, source: [...acc.source, newItem] };
+              }, { source: [] });
+              this.setState({ data });
             });
         }
       });
@@ -159,15 +184,18 @@ export default class CreateInvoice extends PureComponent {
       :
       <option value=''>None</option>;
 
-    const tableListOfProducts = this.state.data.source.map(item => (
-      <tr key={item.itemId} id={item.itemId} className='invoiceProduct'>
-        <td>{item.itemData.name}</td>
-        <td id={`price-${item.itemId}`}>{item.itemData.price}</td>
-        <td id={`qty-${item.itemId}`}>
-          <FormControl type='number' defaultValue='1' onChange={this.addProductQuantity} data-id={item.itemId} />
-        </td>
-        <td><Button bsStyle='danger' onClick={this.removeProduct} data-id={item.itemId}>Delete</Button></td>
-      </tr>));
+    const tableListOfProducts = this.state.data.source.map((item) => {
+      const quantity = (item.qty) ? item.qty : '1';
+      return (
+        <tr key={item.itemId} id={item.itemId} className='invoiceProduct'>
+          <td>{item.itemData.name}</td>
+          <td id={`price-${item.itemId}`}>{item.itemData.price}</td>
+          <td id={`qty-${item.itemId}`}>
+            <FormControl type='number' defaultValue={quantity} onChange={this.addProductQuantity} data-id={item.itemId} />
+          </td>
+          <td><Button bsStyle='danger' onClick={this.removeProduct} data-id={item.itemId} data-invoice_item_id={item.invoice_item_id}>Delete</Button></td>
+        </tr>);
+    });
 
     return (
       <div >
@@ -218,7 +246,7 @@ export default class CreateInvoice extends PureComponent {
           </Table>
           <h1>Total: {this.state.total}</h1>
           <Col sm={11}>
-            <Button type='submit' bsStyle='info'>Submit</Button>
+            <Button type='submit' bsStyle='info'>Save Invoice</Button>
           </Col>
           <Col sm={1}>
             <Link to='/invoices' className='btn btn-default'>Cancel</Link>
